@@ -11,6 +11,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 虎哥
  * @since 2021-12-22
  */
+import com.hmdp.dto.Result;
+
 public interface IFollowService extends IService<Follow> {
 
+    Result follow(Long followUserId, Boolean isFollow);
+
+    Result isFollow(Long followUserId);
+
+    Result followCommons(Long id);
 }

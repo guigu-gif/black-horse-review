@@ -1,1 +1,21 @@
+# IDE
 .idea/
+*.iml
+target/
+
+# 日志
+dianping-applet/logs/
+
+# 敏感配置（含API Key，不上传）
+dianping-backend/src/main/resources/application.yaml
+
+# Qdrant 向量数据库本地存储（数据文件，不上传）
+storage/
+.qdrant-initialized
+
+# Claude Code 内部文件
+.claude/
+
+# 无用文件
+nul
+cunc/

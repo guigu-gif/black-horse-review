@@ -15,3 +15,4 @@ public class WebExceptionAdvice {
         return Result.fail("服务器异常");
     }
 }
+//全局异常处理器，用于处理所有异常

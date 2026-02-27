@@ -16,6 +16,16 @@ storage/
 # Claude Code 内部文件
 .claude/
 
+# 个人学习文件（不上传）
+docs/个人设定/
+docs/学习计划.md
+docs/学习进度.md
+docs/疑问记录.md
+docs/知识盲区.md
+docs/代码学习模板.md
+docs/今日学习总结*.md
+学习进度.md
+
 # 无用文件
 nul
 cunc/

@@ -9,4 +9,6 @@ public interface IShopFavoriteService extends IService<ShopFavorite> {
     Result toggleFavorite(Long shopId);
 
     Result getFavoriteList();
+
+    Result getFavoriteCount(Long shopId);
 }

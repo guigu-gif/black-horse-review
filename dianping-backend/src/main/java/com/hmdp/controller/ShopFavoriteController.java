@@ -33,4 +33,14 @@ public class ShopFavoriteController {
     public Result getFavoriteList() {
         return shopFavoriteService.getFavoriteList();
     }
+
+    /**
+     * 查询店铺被收藏的数量
+     * GET /shop/favorite/count/{shopId}
+     */
+    @GetMapping("/count/{shopId}")
+    public Result getFavoriteCount(@PathVariable("shopId") Long shopId) {
+        return shopFavoriteService.getFavoriteCount(shopId);
+    }
+
 }

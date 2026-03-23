@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>传统做法 - 手动操作DOM</title>
+</head>
+<body>
+    <h2>传统做法：手动操作DOM</h2>
+
+    <!-- 输入框 -->
+    <input type="text" id="input-box" placeholder="输入点什么...">
+
+    <!-- 显示区域 -->
+    <p>你输入的内容：<span id="display"></span></p>
+
+    <script>
+        // 获取DOM元素
+        const inputBox = document.getElementById('input-box');
+        const display = document.getElementById('display');
+
+        // 监听输入事件
+        inputBox.addEventListener('input', function() {
+            // 手动把输入框的值塞进显示区域
+            display.textContent = inputBox.value;
+        });
+    </script>
+</body>
+</html>

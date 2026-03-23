@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>博客列表 - Vue改写对比</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .blog-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+        }
+        .card-title { font-weight: bold; margin-bottom: 5px; }
+        .card-author { color: #666; font-size: 12px; }
+        .card-footer { margin-top: 8px; color: #999; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>博客列表（Vue版本）</h2>
+
+        <!--
+            看这里！只写一次模板
+            不管有多少博客，都是这一个结构
+        -->
+        <div v-for="blog in blogs" :key="blog.id" class="blog-card">
+            <div class="card-title">{{ blog.title }}</div>
+            <div class="card-author">作者：{{ blog.name }}</div>
+            <div class="card-footer">
+                ❤️ {{ blog.liked }} 👁️ {{ blog.comments }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    // 数据在这里，和HTML完全分开
+                    blogs: [
+                        { id: 1, title: "海底捞探店", name: "张三", liked: 128, comments: 45 },
+                        { id: 2, title: "麦当劳新品", name: "李四", liked: 89, comments: 23 },
+                        { id: 3, title: "肯德基优惠", name: "王五", liked: 156, comments: 67 }
+                    ]
+                }
+            },
+            mounted() {
+                // 实际项目里，这里会调用你的后端接口
+                // axios.get('/api/blog/hot').then(res => {
+                //     this.blogs = res.data;  // 数据一变，页面自动更新
+                // });
+            }
+        }).mount('#app');
+
+        // 对比你项目里的做法：
+        // 1. 你的项目：每个博客调用renderCard()，拼一次HTML字符串
+        // 2. Vue做法：写一次模板，v-for自动循环
+        //
+        // 如果有100条博客：
+        // - 你的项目：renderCard()执行100次，拼100次字符串
+        // - Vue：模板写一次，自动循环100次
+    </script>
+</body>
+</html>

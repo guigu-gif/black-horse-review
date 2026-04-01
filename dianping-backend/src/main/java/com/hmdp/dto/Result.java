@@ -14,17 +14,21 @@ public class Result {
     private String errorMsg;
     private Object data;
     private Long total;
+    private Integer code;
 
     public static Result ok(){
-        return new Result(true, null, null, null);
+        return new Result(true, null, null, null, 200);
     }
     public static Result ok(Object data){
-        return new Result(true, null, data, null);
+        return new Result(true, null, data, null, 200);
     }
     public static Result ok(List<?> data, Long total){
-        return new Result(true, null, data, total);
+        return new Result(true, null, data, total, 200);
     }
     public static Result fail(String errorMsg){
-        return new Result(false, errorMsg, null, null);
+        return new Result(false, errorMsg, null, null, 400);
+    }
+    public static Result fail(int httpStatus, String errorMsg){
+        return new Result(false, errorMsg, null, null, httpStatus);
     }
 }

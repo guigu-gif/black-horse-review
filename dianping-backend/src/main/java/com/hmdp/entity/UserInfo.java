@@ -1,6 +1,7 @@
 package com.hmdp.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -83,5 +84,13 @@ public class UserInfo implements Serializable {
      */
     private LocalDateTime updateTime;
 
+    @TableField(exist = false)
+    private Integer blogCount;
+
+    @TableField(exist = false)
+    private Integer commentCount;
+
+    @TableField(exist = false)
+    private Integer collectCount;
 
 }

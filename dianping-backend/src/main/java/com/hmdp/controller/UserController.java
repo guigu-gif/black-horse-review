@@ -7,7 +7,11 @@ import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
 import com.hmdp.entity.UserInfo;
+import com.hmdp.service.IBlogBookmarkService;
+import com.hmdp.service.IBlogService;
+import com.hmdp.service.ICommentService;
 import com.hmdp.service.IFollowService;
+import com.hmdp.service.IShopFavoriteService;
 import com.hmdp.service.IUserInfoService;
 import com.hmdp.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +41,18 @@ public class UserController {
 
     @Resource
     private IFollowService followService;
+
+    @Resource
+    private IBlogService blogService;
+
+    @Resource
+    private ICommentService commentService;
+
+    @Resource
+    private IShopFavoriteService shopFavoriteService;
+
+    @Resource
+    private IBlogBookmarkService blogBookmarkService;
 
     /**
      * 发送手机验证码（固定114514）
@@ -93,9 +109,13 @@ public class UserController {
         }
         info.setCreateTime(null);
         info.setUpdateTime(null);
-        // 实时统计关注数和粉丝数，保证数据准确
         info.setFollowee(followService.query().eq("user_id", userId).count());
         info.setFans(followService.query().eq("follow_user_id", userId).count());
+        info.setBlogCount(blogService.query().eq("user_id", userId).count());
+        info.setCommentCount(commentService.query().eq("user_id", userId).count());
+        int shopCollect = shopFavoriteService.query().eq("user_id", userId).count();
+        int blogCollect = blogBookmarkService.query().eq("user_id", userId).count();
+        info.setCollectCount(shopCollect + blogCollect);
         return Result.ok(info);
     }
 }

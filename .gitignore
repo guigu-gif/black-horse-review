@@ -34,10 +34,23 @@ snapshots/
 # Maven 本地仓库（体积大，不上传）
 dianping-backend/.m2/
 
+# 课件资料（图片/pptx/md，不上传）
+docs/资料/*.pptx
+docs/资料/*.md
+docs/资料/*.assets/
+docs/资料/*.txt
+docs/秒杀抢购.jmx
+
+# 旧启动脚本（已整合为 start.bat / stop.bat）
+start-nginx-safe.bat
+start-project.bat
+stop-nginx.bat
+stop-project.bat
+
+# 测试文件
+dianping-backend/src/test/**/*.http
+
 # 无用文件
 nul
 cunc/
 vue-practice/
-
-# 测试文件
-dianping-backend/src/test/java/com/hmdp/test.http

@@ -1,216 +1,153 @@
 # 黑马点评项目启动说明
 
-> 最后更新：2026-02-16
+> 最后更新：2026-04-09
 
 ---
 
-## 🚀 快速启动（推荐）
+## 快速启动
 
-### 方法1：一键启动脚本
+推荐直接用项目根目录下的脚本：
 
-双击运行项目根目录的 `start-project.bat`
+- 启动：`start-project.bat`
+- 停止：`stop-project.bat`
 
-脚本会自动：
-- ✅ 检查MySQL服务（端口3306）
-- ✅ 检查Redis服务（端口6379）
-- ✅ 启动Nginx前端（端口8080）
-- 💡 提示你在IDEA中启动后端
+启动脚本会检查并尝试启动：
 
-启动后访问：http://localhost:8080
+- MySQL
+- Redis
+- Qdrant
+- Nginx
 
----
+启动完成后：
 
-### 方法2：IDEA启动（现已修复）
+- 前端地址：`http://localhost:8080`
+- 后端地址：`http://localhost:8081`
 
-现在可以安全使用IDEA的 **"Start All Services"** 了！
-
-已修复问题：
-- ✅ 不会重复启动nginx
-- ✅ 自动检查nginx是否已运行
-- ✅ 避免端口冲突
-
-启动步骤：
-1. 在IDEA中点击运行配置下拉菜单
-2. 选择 **"Start All Services"**
-3. 等待启动完成
-4. 访问 http://localhost:8080
+如果后端没有自动运行，请在 IDEA 中启动 `HmDianPingApplication`。
 
 ---
 
-## 📋 启动前置条件
+## 脚本说明
 
-### 必须启动的服务
-1. **MySQL** - 数据库服务（端口3306）
-2. **Redis** - 缓存服务（端口6379）
+### `start-project.bat`
 
-### 检查服务状态
+项目总启动入口。
 
-```bash
-# 检查MySQL
-sc query MySQL80
+作用：
 
-# 检查Redis
-netstat -ano | findstr 6379
+- 调用 `scripts/start.js`
+- 检查 MySQL 是否已运行
+- 启动 Redis、Qdrant、Nginx
+- 启动后停留窗口，方便看日志
 
-# 检查nginx
-tasklist | findstr nginx.exe
-```
+### `stop-project.bat`
 
----
+项目总停止入口。
 
-## 🛠️ 脚本说明
+作用：
 
-### start-project.bat
-**功能**：一键启动完整项目
-- 检查MySQL/Redis服务
-- 启动nginx（带检查）
-- 提示启动后端
+- 调用 `scripts/stop.js`
+- 停止 Spring Boot
+- 停止 Nginx
+- 停止 Redis
+- 停止 Qdrant
+- 停止后停留窗口，避免闪退
 
-**使用**：双击运行
+### `start-nginx-safe.bat`
 
----
+兼容旧入口，内部也会调用 `scripts/start.js`。
 
-### start-nginx-safe.bat
-**功能**：安全启动nginx
-- 检查nginx是否已运行
-- 如果未运行，启动nginx
-- 如果已运行，跳过启动
+### `stop-nginx.bat`
 
-**使用**：
-```bash
-# 手动执行
-start-nginx-safe.bat
-
-# 或在IDEA中通过"Start Nginx"运行
-```
+兼容旧入口，内部也会调用 `scripts/stop.js`。
 
 ---
 
-### stop-nginx.bat
-**功能**：优雅停止nginx
-- 先尝试优雅停止（nginx -s quit）
-- 如果失败，强制结束进程
-
-**使用**：
-```bash
-# 手动执行
-stop-nginx.bat
-
-# 或在IDEA中通过"Stop Nginx"运行
-```
-
----
-
-## 🔧 IDEA运行配置说明
-
-### Start All Services（复合配置）
-- 自动执行 Start Nginx
-- 自动启动 HmDianPingApplication
-- **现已修复重复启动问题**
-
-### Start Nginx
-- 调用 `start-nginx-safe.bat`
-- 工作目录：项目根目录
-- **会检查nginx是否已运行**
-
-### Stop Nginx
-- 调用 `stop-nginx.bat`
-- 优雅停止nginx进程
-
-### HmDianPingApplication
-- Spring Boot启动配置
-- 端口：8081
-
----
-
-## ❌ 常见问题
-
-### Q1: 提示"店铺加载失败"
-**原因**：多个nginx进程冲突
-
-**解决**：
-```bash
-# 停止所有nginx
-stop-nginx.bat
-
-# 重新启动
-start-nginx-safe.bat
-```
-
----
-
-### Q2: 端口8080被占用
-**检查**：
-```bash
-netstat -ano | findstr 8080
-```
-
-**解决**：
-- 如果是nginx占用：运行 `stop-nginx.bat`
-- 如果是其他程序：找到进程ID并结束
-
----
-
-### Q3: MySQL或Redis未启动
-**MySQL**：
-```bash
-net start MySQL80
-```
-
-**Redis**：
-- 手动启动redis-server.exe
-- 或安装为Windows服务
-
----
-
-### Q4: 后端启动失败
-**检查**：
-1. MySQL是否在运行
-2. Redis是否在运行
-3. application.yaml配置是否正确
-4. 端口8081是否被占用
-
----
-
-## 📊 端口占用情况
+## 端口说明
 
 | 服务 | 端口 | 说明 |
 |------|------|------|
-| 前端 (nginx) | 8080 | 访问入口 |
-| 后端 (Spring Boot) | 8081 | API服务 |
+| Nginx | 8080 | 前端入口 |
+| Spring Boot | 8081 | 后端接口 |
 | MySQL | 3306 | 数据库 |
 | Redis | 6379 | 缓存 |
+| Qdrant | 6333 | 向量检索 |
 
 ---
 
-## 🎯 推荐启动流程
+## 常见问题
 
-### 每天第一次启动
-1. 开机后，MySQL和Redis自动启动（如果配置了自启动）
-2. 双击 `start-project.bat`（检查环境+启动nginx）
-3. 在IDEA中启动 `HmDianPingApplication`
-4. 访问 http://localhost:8080
+### 1. 首页打不开
 
-### 后续开发（nginx已启动）
-- 直接在IDEA中运行 `HmDianPingApplication` 即可
-- 或使用 `Start All Services`（会自动跳过nginx启动）
+先确认：
 
-### 关机前
-- 不需要手动停止任何服务
-- 关机会自动结束所有进程
+- `Nginx` 是否启动
+- 8080 端口是否被占用
+
+检查命令：
+
+```bash
+tasklist | findstr nginx.exe
+netstat -ano | findstr 8080
+```
+
+### 2. 后端接口报错
+
+先确认：
+
+- Spring Boot 是否已启动
+- Redis 是否已启动
+- MySQL 是否已启动
+
+检查命令：
+
+```bash
+netstat -ano | findstr 8081
+netstat -ano | findstr 6379
+sc query MySQL80
+```
+
+### 3. 停止脚本以前会闪退，现在怎么用
+
+现在直接双击：
+
+- `stop-project.bat`
+
+窗口会保留，不会再一闪而过。
+
+### 4. 图片 404
+
+这次已经补了首页常见缺失图片的占位文件。
+
+如果后续还有新的图片 404，优先检查：
+
+- 数据库里的图片路径是否真实存在
+- `dianping-applet/html/hmdp/imgs/` 下是否有对应文件
 
 ---
 
-## 📝 修改记录
+## 推荐操作流程
 
-### 2026-02-16
-- ✅ 创建 `start-nginx-safe.bat` - 安全启动脚本
-- ✅ 创建 `stop-nginx.bat` - 优雅停止脚本
-- ✅ 创建 `start-project.bat` - 一键启动脚本
-- ✅ 修改IDEA的Start_Nginx.xml - 使用安全脚本
-- ✅ 修改IDEA的Stop_Nginx.xml - 使用优雅停止
-- ✅ 修复"重复启动nginx导致端口冲突"问题
+### 日常启动
+
+1. 双击 `start-project.bat`
+2. 确认前端服务正常
+3. 如果后端没起来，在 IDEA 里启动 `HmDianPingApplication`
+4. 打开 `http://localhost:8080`
+
+### 日常停止
+
+1. 双击 `stop-project.bat`
+2. 等待脚本输出完成
+3. 确认 Redis / Qdrant / Nginx / Spring Boot 已停止
 
 ---
 
-**如有问题，请查看 docs/疑问记录.md**
+## 备注
+
+如果你后面继续调整脚本逻辑，优先改这两个 JS 文件：
+
+- `scripts/start.js`
+- `scripts/stop.js`
+
+批处理文件现在只是入口壳，不建议再把主要逻辑重新塞回 `.bat` 里。

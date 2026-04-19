@@ -94,6 +94,11 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
         // SINTER：求两个Set的交集
         Set<String> commonIds = stringRedisTemplate.opsForSet().intersect(myKey, otherKey);
         if (commonIds == null || commonIds.isEmpty()) {
+            rebuildFollowSet(userId, myKey);
+            rebuildFollowSet(id, otherKey);
+            commonIds = stringRedisTemplate.opsForSet().intersect(myKey, otherKey);
+        }
+        if (commonIds == null || commonIds.isEmpty()) {
             return Result.ok(Collections.emptyList());
         }
 
@@ -104,5 +109,17 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
                 .collect(Collectors.toList());
 
         return Result.ok(users);
+    }
+
+    private void rebuildFollowSet(Long userId, String key) {
+        List<Follow> follows = query()
+                .eq("user_id", userId)
+                .list();
+        if (follows == null || follows.isEmpty()) {
+            return;
+        }
+        for (Follow follow : follows) {
+            stringRedisTemplate.opsForSet().add(key, follow.getFollowUserId().toString());
+        }
     }
 }

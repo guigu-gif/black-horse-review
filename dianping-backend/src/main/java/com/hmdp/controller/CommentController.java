@@ -43,6 +43,11 @@ public class CommentController {
         return toResponse(commentService.deleteComment(commentId));
     }
 
+    @DeleteMapping("/comment/reply/{replyId}")
+    public ResponseEntity<Result> deleteReply(@PathVariable("replyId") Long replyId) {
+        return toResponse(commentService.deleteReply(replyId));
+    }
+
     @PutMapping("/comment/{commentId}/like")
     public ResponseEntity<Result> likeComment(@PathVariable("commentId") Long commentId) {
         return toResponse(commentService.likeComment(commentId));

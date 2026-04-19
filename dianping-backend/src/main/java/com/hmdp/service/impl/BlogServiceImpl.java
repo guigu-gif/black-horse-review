@@ -73,12 +73,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     public Result queryBlogOfFollow(Long max, Integer offset) {
         // 1. 当前用户的收件箱 key
         Long userId = UserHolder.getUser().getId();
-        String key = "feed:" + userId;
+        String key = RedisConstants.FEED_KEY + userId;
 
         // 2. 从ZSet取博客ID，按score倒序，游标翻页
         Set<ZSetOperations.TypedTuple<String>> typedTuples =
                 stringRedisTemplate.opsForZSet()
                         .reverseRangeByScoreWithScores(key, 0, max, offset, 5);
+
+        if ((typedTuples == null || typedTuples.isEmpty()) && offset != null && offset == 0) {
+            rebuildFeed(userId, key);
+            typedTuples = stringRedisTemplate.opsForZSet()
+                    .reverseRangeByScoreWithScores(key, 0, max, offset, 5);
+        }
 
         if (typedTuples == null || typedTuples.isEmpty()) {
             ScrollResult empty = new ScrollResult();
@@ -126,6 +132,37 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         result.setMinTime(minTime);
         result.setOffset(os);
         return Result.ok(result);
+    }
+
+    private void rebuildFeed(Long userId, String feedKey) {
+        List<Follow> follows = followService.query()
+                .eq("user_id", userId)
+                .list();
+        if (follows == null || follows.isEmpty()) {
+            return;
+        }
+
+        List<Long> followUserIds = follows.stream()
+                .map(Follow::getFollowUserId)
+                .collect(Collectors.toList());
+        if (followUserIds.isEmpty()) {
+            return;
+        }
+
+        List<Blog> blogs = query()
+                .in("user_id", followUserIds)
+                .orderByDesc("create_time")
+                .list();
+        if (blogs == null || blogs.isEmpty()) {
+            return;
+        }
+
+        for (Blog blog : blogs) {
+            long score = blog.getCreateTime() != null
+                    ? blog.getCreateTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    : System.currentTimeMillis();
+            stringRedisTemplate.opsForZSet().add(feedKey, blog.getId().toString(), score);
+        }
     }
 
     /**

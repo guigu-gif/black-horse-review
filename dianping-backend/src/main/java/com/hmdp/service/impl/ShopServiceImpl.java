@@ -2,6 +2,7 @@ package com.hmdp.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.hmdp.utils.ShopBloomFilter;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
@@ -38,6 +39,9 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private ShopBloomFilter shopBloomFilter;
 
     // 线程池（用于异步更新缓存）
     private static final ExecutorService CACHE_REBUILD_EXECUTOR = Executors.newFixedThreadPool(10);
@@ -97,9 +101,14 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
 
     /**
-     * 缓存击穿解决方案：互斥锁
+     * 缓存击穿解决方案：互斥锁（含布隆过滤器防穿透）
      */
     public Shop queryWithMutex(Long id) {
+        // 布隆过滤器：id 一定不存在时直接拦截，不查 Redis 也不查 DB
+        if (!shopBloomFilter.mightContain(id)) {
+            return null;
+        }
+
         String key = CACHE_SHOP_KEY + id;
         // 1. 从Redis查询商铺缓存
         String shopJson = stringRedisTemplate.opsForValue().get(key);

@@ -21,5 +21,7 @@ public interface ICommentService extends IService<Comment> {
     Result likeComment(Long commentId);
 
     Result likeReply(Long replyId);
+
+    Result deleteReply(Long replyId);
 }
 

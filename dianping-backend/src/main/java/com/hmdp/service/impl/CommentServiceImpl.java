@@ -154,34 +154,45 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (commentId == null) {
             return Result.fail("commentId不能为空");
         }
-
         Comment main = getById(commentId);
-        if (main != null) {
-            if (!Objects.equals(main.getUserId(), user.getId())) {
-                return Result.fail(403, "无权操作");
-            }
-            List<CommentReply> replies = commentReplyMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CommentReply>()
-                            .eq("parent_id", commentId)
-            );
-            removeById(commentId);
-            commentReplyMapper.delete(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CommentReply>()
-                    .eq("parent_id", commentId));
-            deleteLikedKey(commentId);
-            replies.forEach(reply -> deleteLikedKey(reply.getId()));
-            updateBlogCommentCount(main.getBlogId(), -(1 + replies.size()));
-            return Result.ok();
+        if (main == null) {
+            return Result.fail(404, "评论不存在");
         }
+        if (!Objects.equals(main.getUserId(), user.getId())) {
+            return Result.fail(403, "无权操作");
+        }
+        List<CommentReply> replies = commentReplyMapper.selectList(
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CommentReply>()
+                        .eq("parent_id", commentId)
+        );
+        removeById(commentId);
+        commentReplyMapper.delete(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CommentReply>()
+                .eq("parent_id", commentId));
+        deleteLikedKey(commentId);
+        replies.forEach(reply -> deleteLikedKey(reply.getId()));
+        updateBlogCommentCount(main.getBlogId(), -(1 + replies.size()));
+        return Result.ok();
+    }
 
-        CommentReply reply = commentReplyMapper.selectById(commentId);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result deleteReply(Long replyId) {
+        UserDTO user = UserHolder.getUser();
+        if (user == null) {
+            return Result.fail("请先登录");
+        }
+        if (replyId == null) {
+            return Result.fail("replyId不能为空");
+        }
+        CommentReply reply = commentReplyMapper.selectById(replyId);
         if (reply == null) {
-            return Result.fail("评论不存在");
+            return Result.fail(404, "评论不存在");
         }
         if (!Objects.equals(reply.getUserId(), user.getId())) {
             return Result.fail(403, "无权操作");
         }
-        commentReplyMapper.deleteById(commentId);
-        deleteLikedKey(commentId);
+        commentReplyMapper.deleteById(replyId);
+        deleteLikedKey(replyId);
         updateBlogCommentCount(reply.getBlogId(), -1);
         return Result.ok();
     }

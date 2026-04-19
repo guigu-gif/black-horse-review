@@ -27,6 +27,17 @@ docs/今日学习总结*.md
 学习进度.md
 obsidian-notes/
 
+# 运行时文件（日志、Redis数据）
+runtime/
+snapshots/
+
+# Maven 本地仓库（体积大，不上传）
+dianping-backend/.m2/
+
 # 无用文件
 nul
 cunc/
+vue-practice/
+
+# 测试文件
+dianping-backend/src/test/java/com/hmdp/test.http
